@@ -1,13 +1,15 @@
 import React from 'react'
 import { Clapperboard, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/Navbar.jsx'
 
 
 function Home() {
   const navigate = useNavigate()
   return (
-    <div className="h-screen w-full bg-[#1b1b1b] flex justify-center items-center">
-
+    <>
+    <Navbar/>
+    <div className="h-[90.1vh] w-full bg-[#1b1b1b] flex justify-center items-center">
       <div className="
         h-[55vh] w-[43vw]
         rounded-2xl
@@ -15,7 +17,7 @@ function Home() {
         bg-[#0B0B0E]
         flex flex-col items-center
         gap-3
-        py-8 px-6
+        py-10 px-8
         shadow-xl
         transition-all duration-300
         hover:shadow-2xl
@@ -60,6 +62,7 @@ function Home() {
 
       </div>
     </div>
+    </>
   )
 }
 
