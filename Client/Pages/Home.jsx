@@ -1,7 +1,7 @@
 import React from 'react'
 import { Clapperboard, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar.jsx'
+import Navbar from '../componentsRaw/Navbar.jsx'
 
 
 function Home() {
