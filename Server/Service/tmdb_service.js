@@ -12,7 +12,7 @@ export const getMovieInfo = async (title, year) => {
         if (response.data.Response === 'False') {
             return null
         }
-        // console.log(response.data)
+        
         return {
             title: response.data.Title,
             year: response.data.Year,
