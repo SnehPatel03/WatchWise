@@ -1,8 +1,9 @@
 import { Clapperboard } from "lucide-react"
 import React from "react"
 import { Github } from "lucide-react"
-
+import { useNavigate } from "react-router-dom"
 const Navbar = () => {
+    const navigateTo = useNavigate()
     return (
         <nav className="
       w-full
@@ -16,7 +17,7 @@ const Navbar = () => {
       px-8
     ">
 
-            <div className="cursor-pointer flex items-center gap-2 select-none">
+            <div className="cursor-pointer flex items-center gap-2 select-none" onClick={() => navigateTo('/')}>
                 <Clapperboard size={22} className="text-[#F5C518]" />
                 <span className="text-[#F5C518] text-xl font-extrabold tracking-wide">
                     Watch
@@ -39,7 +40,6 @@ const Navbar = () => {
             >
                 <Github size={22} />
             </a>
-
         </nav>
     )
 }
