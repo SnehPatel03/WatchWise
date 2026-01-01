@@ -1,11 +1,13 @@
-import { Clapperboard } from "lucide-react"
+import { Clapperboard, ImageOff } from "lucide-react"
 import React from "react"
 import { Github } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { motion } from "motion/react"
+
 const Navbar = () => {
     const navigateTo = useNavigate()
     return (
-        <nav className="
+        <motion.nav initial={{y:-50,opacity:0}} animate={{y:0,opacity:1}} transition={{delay:0.5 ,duration:0.5}} className="
       w-full
       h-16
       bg-[#1b1b1b]
@@ -40,7 +42,7 @@ const Navbar = () => {
             >
                 <Github size={22} />
             </a>
-        </nav>
+        </motion.nav>
     )
 }
 

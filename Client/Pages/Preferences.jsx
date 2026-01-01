@@ -6,7 +6,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { MultiSelect } from '@/components/ui/multi-select.jsx';
 import { useNavigate } from 'react-router-dom';
 import { getMovieRecommendation } from '../Service/movieService.js';
-
+import {motion} from 'motion/react'
 
 function Preferences() {
 
@@ -68,34 +68,36 @@ function Preferences() {
       mood,
       genre,
       language,
-      era,  
+      era,
       notes,
-      numberOfRec : Number(numberOfRec)
+      numberOfRec: Number(numberOfRec)
     }
     // console.log("Preferences", preferences)
     navigateTo('/movies')
-     try {
-    const result = await getMovieRecommendation(preferences);
+    try {
+      // const result = await getMovieRecommendation(preferences);
 
-    navigateTo("/movies", {
-      state: {
-        preferences
-      },
-    });
-  } catch (error) {
-    console.error("Error in passing params from /Preference to /Movies movies", error);
-  }
+      navigateTo("/movies", {
+        state: {
+          preferences
+        },
+      });
+    } catch (error) {
+      console.error("Error in passing params from /Preference to /Movies movies", error);
+    }
 
   }
   return (
     <>
       <Navbar />
-      <div className='min-h-screen w-full bg-[#1b1b1b] flex items-start justify-center p-4 '>
-        <div className='w-full max-w-2xl bg-[#252525] px-10 py-12 rounded-xl border-2 mt-[4vw] border-[#F5C518] shadow-lg shadow-[#F5C518]/10'>
-          <div className='flex items-center justify-center flex-col gap-3 mb-8'>
+      <div className=' min-h-screen w-full bg-[#1b1b1b] flex items-start justify-center p-4 pb-15 '>
+        <motion.div initial={{ opacity:0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}  className='w-[95vw] sm:w-full max-w-2xl bg-[#252525] px-10 py-12 rounded-xl border-2 mt-[4vw] border-[#F5C518] shadow-lg shadow-[#F5C518]/10'>
+          <div className='flex items-center gap-6 justify-center flex-col sm:gap-3 mb-8'>
             <Popcorn size={65} color="#F5C518" />
-            <div className='flex flex-col justify-start items-center'>
-              <h1 className="text-3xl font-bold tracking-tight text-[#F5C518]">
+            <div className='flex flex-col justify-start items-center gap-3 sm:gap-0'>
+              <h1 className=" text-3xl font-bold tracking-tight text-[#F5C518] ">
                 Movies that match your moment
               </h1>
               <p className="mt-1 text-sm text-gray-200">
@@ -106,11 +108,11 @@ function Preferences() {
 
           <form onSubmit={submiteHandler} className='flex flex-col gap-3 text-gray-400'>
             <CustomSelect options={moodOptions} value={mood} onChange={setmood} placeholder={"What vibe are you in?"} label="Current mood" />
-            
+
             <h1 className="block text-md font-semibold text-[#F5C518] mb-2">
               Your Genre Pick
             </h1>
-            <MultiSelect  maxSelection={3} className='w-full bg-[#1b1b1b] text-gray-200 hover:text-gray-200  border-2 border-gray-700 hover:border-[#F5C518] rounded-lg px-4 py-3 focus:outline-none focus:border-[#F5C518] focus:ring-2 focus:ring-[#F5C518]/50 transition-all' options={genreOptions} value={genre} onValueChange={setgenre}/>
+            <MultiSelect maxSelection={3} className='w-full bg-[#1b1b1b] text-gray-200 hover:text-gray-200  border-2 border-gray-700 hover:border-[#F5C518] rounded-lg px-4 py-3 focus:outline-none focus:border-[#F5C518] focus:ring-2 focus:ring-[#F5C518]/50 transition-all' options={genreOptions} value={genre} onValueChange={setgenre} />
             <CustomSelect options={languageOption} value={language} onChange={setlanguage} placeholder="Language You Like  " label="Choose a language" />
             <CustomSelect options={eraOptions} value={era} onChange={setera} placeholder="What Era you enjoy most?" label="Pick a movie Era" />
             <div className="flex flex-col gap-2">
@@ -142,14 +144,14 @@ function Preferences() {
             <CustomSelect options={numberOfRecOptions} value={numberOfRec} onChange={setnumbesOfRec} placeholder="Number of movies for Recommendation" label="How many Movies?" />
             <div className='flex justify-center w-[43vw]'>
               <Button
-               type="submit" 
-                className='mt-5 -mb-3 w-[17vw] bg-[#F5C518] hover:bg-[#e6b510] text-[#1b1b1b] font-bold text-md py-4   rounded-lg transition-all duration-300 shadow-lg hover:shadow-[#F5C518]/50 hover:scale-[1.02] active:scale-[0.98] border-none'
+                type="submit"
+                className='ml-[29vw] sm:ml-0 mt-5 -mb-3 sm:w-[17vw] bg-[#F5C518] hover:bg-[#e6b510] text-[#1b1b1b] font-bold text-md py-4   rounded-lg transition-all duration-300 shadow-lg hover:shadow-[#F5C518]/50 hover:scale-[1.02] active:scale-[0.98] border-none'
               >
                 Get Recommendations 🎬
               </Button>
             </div>
           </form>
-        </div>
+        </motion.div>
       </div>
     </>
   )

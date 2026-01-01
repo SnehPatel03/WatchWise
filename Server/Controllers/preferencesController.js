@@ -58,7 +58,7 @@ export const preference = async (req, res) => {
         const movies = [];
         for (const m of aimovies) {
             const movieData = await getMovieInfo(m.title, m.year)
-            console.log(movieData)
+            // console.log(movieData)
             if (movieData) {
                 movies.push(movieData)
             }
