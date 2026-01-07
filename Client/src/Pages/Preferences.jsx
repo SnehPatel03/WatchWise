@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Popcorn } from 'lucide-react';
 import Navbar from '../../componentsRaw/Navbar';
 import CustomSelect from '../../componentsRaw/CustomSelect';
@@ -18,6 +20,8 @@ function Preferences() {
   const [notes, setnotes] = useState("")
   const [numberOfRec, setnumbesOfRec] = useState("")
   const [err, seterr] = useState(null)
+  const [loading, setLoading] = useState(false);
+
 
 
   const moodOptions = [
@@ -63,12 +67,14 @@ function Preferences() {
     { value: "15", label: "15" },
     { value: "20", label: "20" },
   ]
- const submiteHandler = async (e) => {
+const submiteHandler = async (e) => {
   e.preventDefault();
   seterr("");
+  setLoading(true);
 
-  // Frontend validation
   if (!genre.length) {
+    setLoading(false);
+    toast.error("Please select at least one genre");
     seterr("Please select at least one genre");
     return;
   }
@@ -83,10 +89,8 @@ function Preferences() {
   };
 
   try {
-    // ✅ CALL BACKEND
     const result = await getMovieRecommendation(preferences);
 
-    // ✅ Navigate ONLY on success
     navigateTo("/movies", {
       state: {
         movies: result,
@@ -95,14 +99,17 @@ function Preferences() {
     });
 
   } catch (error) {
-    // ✅ Backend validation error
-    if (error.response && error.response.data?.message) {
-      seterr(error.response.data.message);
-    } else {
-      seterr("Recommendation service is waking up. Please try again.");
-    }
+    const message =
+      error.response?.data?.message ||
+      "Recommendation service is waking up. Please try again.";
+
+    seterr(message);
+    toast.error(message);
+  } finally {
+    setLoading(false);
   }
 };
+
 
   return (
     <>
@@ -161,20 +168,34 @@ function Preferences() {
             <CustomSelect options={numberOfRecOptions} value={numberOfRec} onChange={setnumbesOfRec} placeholder="Number of movies for Recommendation" label="How many Movies?" />
             <div className='flex justify-center w-[43vw]'>
               <Button
-                type="submit"
-                className='ml-[29vw] sm:ml-0 mt-5 -mb-3 sm:w-[17vw] bg-[#F5C518] hover:bg-[#e6b510] text-[#1b1b1b] font-bold text-md py-4   rounded-lg transition-all duration-300 shadow-lg hover:shadow-[#F5C518]/50 hover:scale-[1.02] active:scale-[0.98] border-none'
-              >
-                Get Recommendations 🎬
-              </Button>
+  type="submit"
+  disabled={loading}
+  className={`ml-[29vw] sm:ml-0 mt-5 -mb-3 sm:w-[17vw] bg-[#F5C518] hover:bg-[#e6b510] text-[#1b1b1b] font-bold text-md py-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-[#F5C518]/50 hover:scale-[1.02] active:scale-[0.98] border-none ${
+    loading ? "opacity-60 cursor-not-allowed" : ""
+  }`}
+>
+  {loading ? "Getting Recommendations..." : "Get Recommendations 🎬"}
+</Button>
+
             </div>
-               {err && (
+               {/* {err && (
               <p className="text-red-500 text-sm text-center mt-2">
                 {err}
               </p>
-            )}
+            )} */}
           </form>
         </motion.div>
       </div>
+      <ToastContainer
+  position="top-right"
+  autoClose={3000}
+  hideProgressBar={false}
+  closeOnClick
+  pauseOnHover
+  draggable
+  theme="dark"
+/>
+
     </>
   )
 }

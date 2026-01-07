@@ -49,7 +49,7 @@ function Movies() {
                 onClick={() => setselectedMovie(movie)}
                 className="
               relative
-              transition duration-550 ease-in-out
+              transition ease-in duration-550 ease-in-out
               sm:h-[67vh]
               sm:w-[20vw]
               rounded-xl
