@@ -9,7 +9,7 @@ const app = express();
 const Port = 3000;
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173"
+  origin: "https://watch-wise-c6kn.vercel.app/"
 }));
 app.use("/", preferenceRoutes)
 
