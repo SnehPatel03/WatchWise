@@ -11,7 +11,7 @@ const Popup = ({ movie, onClose }) => {
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-4xl bg-[#1b1b1b] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300"
+                className="w-full h-[90vh] sm:h-[7  0vh] max-w-4xl bg-[#1b1b1b] rounded-2xl shadow-2xl overflow-auto sm:overflow-hidden animate-in fade-in zoom-in duration-300"
             >
                 <div className="flex flex-col md:flex-row p-8 gap-8">
                     <div className="flex-shrink-0">
