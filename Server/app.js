@@ -9,7 +9,7 @@ const app = express();
 const Port = 3000;
 app.use(express.json());
 app.use(cors({
-  origin: "https://watchwise-hq.onrender.com"
+  origin: ["https://watchwise-hq.onrender.com",'http://localhost:5173']
 }));
 app.use("/", preferenceRoutes)
 

@@ -6,7 +6,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { MultiSelect } from '@/components/ui/multi-select.jsx';
 import { useNavigate } from 'react-router-dom';
 import { getMovieRecommendation } from '../../Service/movieService.js';
-import {motion} from 'motion/react'
+import { motion } from 'motion/react'
 
 function Preferences() {
 
@@ -17,6 +17,8 @@ function Preferences() {
   const [era, setera] = useState("")
   const [notes, setnotes] = useState("")
   const [numberOfRec, setnumbesOfRec] = useState("")
+  const [err, seterr] = useState(null)
+
 
   const moodOptions = [
     { value: "action", label: "Craving high-octane action" },
@@ -61,39 +63,54 @@ function Preferences() {
     { value: "15", label: "15" },
     { value: "20", label: "20" },
   ]
-  const submiteHandler = async (e) => {
-    e.preventDefault()
+ const submiteHandler = async (e) => {
+  e.preventDefault();
+  seterr("");
 
-    const preferences = {
-      mood,
-      genre,
-      language,
-      era,
-      notes,
-      numberOfRec: Number(numberOfRec)
-    }
-    // console.log("Preferences", preferences)
-    navigateTo('/movies')
-    try {
-      // const result = await getMovieRecommendation(preferences);
-
-      navigateTo("/movies", {
-        state: {
-          preferences
-        },
-      });
-    } catch (error) {
-      console.error("Error in passing params from /Preference to /Movies movies", error);
-    }
-
+  // Frontend validation
+  if (!genre.length) {
+    seterr("Please select at least one genre");
+    return;
   }
+
+  const preferences = {
+    mood,
+    genre,
+    language,
+    era,
+    notes,
+    numberOfRec: Number(numberOfRec)
+  };
+
+  try {
+    // ✅ CALL BACKEND
+    const result = await getMovieRecommendation(preferences);
+
+    // ✅ Navigate ONLY on success
+    navigateTo("/movies", {
+      state: {
+        movies: result,
+        preferences
+      }
+    });
+
+  } catch (error) {
+    // ✅ Backend validation error
+    if (error.response && error.response.data?.message) {
+      seterr(error.response.data.message);
+    } else {
+      seterr("Recommendation service is waking up. Please try again.");
+    }
+  }
+};
+
   return (
     <>
       <Navbar />
       <div className=' min-h-screen w-full bg-[#1b1b1b] flex items-start justify-center p-4 pb-15 '>
-        <motion.div initial={{ opacity:0, y: 20 }}
+        <motion.div initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}  className='w-[95vw] sm:w-full max-w-2xl bg-[#252525] px-10 py-12 rounded-xl border-2 mt-[4vw] border-[#F5C518] shadow-lg shadow-[#F5C518]/10'>
+          transition={{ duration: 1 }} className='w-[95vw] sm:w-full max-w-2xl bg-[#252525] px-10 py-12 rounded-xl border-2 mt-[4vw] border-[#F5C518] shadow-lg shadow-[#F5C518]/10'>
           <div className='flex items-center gap-6 justify-center flex-col sm:gap-3 mb-8'>
             <Popcorn size={65} color="#F5C518" />
             <div className='flex flex-col justify-start items-center gap-3 sm:gap-0'>
@@ -150,6 +167,11 @@ function Preferences() {
                 Get Recommendations 🎬
               </Button>
             </div>
+               {err && (
+              <p className="text-red-500 text-sm text-center mt-2">
+                {err}
+              </p>
+            )}
           </form>
         </motion.div>
       </div>
