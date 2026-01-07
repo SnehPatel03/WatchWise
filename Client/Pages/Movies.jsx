@@ -88,7 +88,7 @@ function Movies() {
 
                 <div className="absolute bottom-7 z-10 p-4 w-full flex flex-col  ">
                   <h2
-                    className={`font-bold  text-white leading-tight ${movie.title.length > 10 ? "text-xl" : "text-3xl"
+                    className={`font-bold  text-white leading-tight ${movie.title.length > 10 ? "text-2xl" : "text-3xl"
                       }`}
                   >
                     {movie.title}
@@ -101,18 +101,13 @@ function Movies() {
                   <p className="text-sm  text-gray-300 mt-4 font-bold">
                     IMDb: {movie.rating}
                   </p>
-<h1>{movie.plot}</h1>
+
                 </div>
               </div>
             ))}
-
-
-
-            {selectedMovie     && (
-              <Popup movie={selectedMovie } onClose={() => setselectedMovie(null)} />
+            {selectedMovie && (
+              <Popup movie={selectedMovie} onClose={() => setselectedMovie(null)} />
             )}
-
-
           </div>
         </div>
       </div>
