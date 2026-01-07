@@ -1,9 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { getMovieRecommendation } from "../Service/movieService.js";
-import Loader from "../componentsRaw/Loader.jsx";
+import { getMovieRecommendation } from "../../Service/movieService.js";
+import Loader from "../../componentsRaw/Loader.jsx";
 import { useState, useEffect } from "react";
-import Navbar from "../componentsRaw/Navbar.jsx";
-import Popup from "../Pages/Popup.jsx";
+import Navbar from "../../componentsRaw/Navbar.jsx";
+import Popup from "./Popup.jsx";
 
 function Movies() {
   const { state } = useLocation();

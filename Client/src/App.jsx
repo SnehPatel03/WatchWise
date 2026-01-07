@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
-import Home from '../pages/Home.jsx'
-import Preferences from '../pages/Preferences.jsx'
-import Movies from '../pages/Movies.jsx'
+import Home from './Pages/Home.jsx'
+import Preferences from './Pages/Preferences.jsx'
+import Movies from './Pages/Movies.jsx'
 
 
 function App() {

@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Popcorn } from 'lucide-react';
-import Navbar from '../componentsRaw/Navbar';
-import CustomSelect from '../componentsRaw/CustomSelect';
+import Navbar from '../../componentsRaw/Navbar';
+import CustomSelect from '../../componentsRaw/CustomSelect';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { MultiSelect } from '@/components/ui/multi-select.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getMovieRecommendation } from '../Service/movieService.js';
+import { getMovieRecommendation } from '../../Service/movieService.js';
 import {motion} from 'motion/react'
 
 function Preferences() {
