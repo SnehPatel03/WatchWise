@@ -29,12 +29,12 @@ function Home() {
           <div className="p-3 rounded-full bg-[#141418]">
             <Clapperboard size={56} color="#F5C518" strokeWidth={2} />
           </div>
-          <h2 className="text-3xl font-extrabold tracking-wide text-[#F5C518]">
+          <h2  className="text-3xl font-extrabold tracking-wide text-[#F5C518]">
             WatchWise
           </h2>
-          <p className="text-center text-[#EAEAEA] text-base max-w-sm leading-relaxed">
+          <p  className="text-center text-[#EAEAEA] text-base max-w-sm leading-relaxed">
             Stop scrolling.
-            <span className="text-[#F5C518] font-semibold"> Start watching </span>
+            <span  className="text-[#F5C518] font-semibold"> Start watching </span>
             the perfect movie for your moment.
           </p>
 

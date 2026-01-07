@@ -13,9 +13,6 @@ const Popup = ({ movie, onClose }) => {
                 onClick={(e) => e.stopPropagation()}
                 className="w-full max-w-4xl bg-[#1b1b1b] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300"
             >
-
-
-
                 <div className="flex flex-col md:flex-row p-8 gap-8">
                     <div className="flex-shrink-0">
                         <img
@@ -24,7 +21,6 @@ const Popup = ({ movie, onClose }) => {
                             className="w-64 h-96 object-cover rounded-xl shadow-lg"
                         />
                     </div>
-
                     <div className="flex-1 flex flex-col">
                         <div className="mb-4">
                             <h1 className="text-4xl font-bold text-white mb-2">{movie.title}</h1>

@@ -13,7 +13,6 @@ function Movies() {
   const [loader, setloader] = useState(true)
   const [selectedMovie, setselectedMovie] = useState(null)
 
-
   useEffect(() => {
     if (!preferences) return;
 
@@ -93,15 +92,12 @@ function Movies() {
                   >
                     {movie.title}
                   </h2>
-
-
                   <p className="text-sm  text-gray-300 absolute -bottom-3 font-bold">
                     {movie.year}
                   </p>
                   <p className="text-sm  text-gray-300 mt-4 font-bold">
                     IMDb: {movie.rating}
                   </p>
-
                 </div>
               </div>
             ))}
