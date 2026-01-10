@@ -15,13 +15,13 @@ function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }} className="
       w-[88vw]
-        sm:h-[55vh] sm:w-[43vw]
+        sm:h-50vh] sm:w-[43vw]
         rounded-2xl
         border border-[#F5C518]
         bg-[#0B0B0E]
         flex flex-col items-center
         gap-3
-        py-10 px-8
+        py-10 px-8````
         shadow-xl
         transition-all duration-300
         hover:shadow-2xl
