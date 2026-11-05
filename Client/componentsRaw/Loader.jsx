@@ -1,12 +1,15 @@
-import { Loader2 } from "lucide-react";
+import { LoaderCircle, Sparkles } from "lucide-react"
 
 export default function Loader() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#1b1b1b]">
-      <Loader2 className="h-10 w-10 animate-spin text-[#F5C518]" />
-      <p className="mt-4 text-gray-300 text-sm">
-        Finding movies just for you...
-      </p>
+    <div className="app-shell">
+      <main className="loading-page">
+        <div className="loading-content">
+          <div className="loading-orb"><LoaderCircle size={25} className="spin-icon" /></div>
+          <div className="eyebrow"><span className="eyebrow-dot" /> Curating your shortlist</div>
+          <p><Sparkles size={14} /> Finding the right movie for your kind of night...</p>
+        </div>
+      </main>
     </div>
-  );
+  )
 }

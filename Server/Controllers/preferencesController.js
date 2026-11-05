@@ -54,7 +54,7 @@ export const preference = async (req, res) => {
         const prompt = promptMaker({ genre, mood, language, notes, numberOfRec })
         const moviesJSON = await getMovieRecommendation(prompt)
         const aimovies = JSON.parse(moviesJSON)
-// console.log("aimovies" ,aimovies)
+        
         const movies = [];
         for (const m of aimovies) {
             const movieData = await getMovieInfo(m.title, m.year)

@@ -1,4 +1,3 @@
-import { Router } from "express";
 import express from 'express'
 import { preference } from "../Controllers/preferencesController.js";
 

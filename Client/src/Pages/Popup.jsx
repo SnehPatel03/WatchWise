@@ -1,71 +1,69 @@
-import React from 'react';
-import { CircleX, Star, Calendar, Globe } from 'lucide-react';
+import { CalendarDays, Globe2, Star, X } from "lucide-react"
+import { useEffect, useState } from "react"
 
-const Popup = ({ movie, onClose }) => {
-    if (!movie) return null;
+function Popup({ movie, onClose }) {
+  const [imageFailed, setImageFailed] = useState(false)
 
-    return (
-        <div
-            onClick={onClose}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-        >
-            <div
-                onClick={(e) => e.stopPropagation()}
-                className="w-full h-[90vh] sm:h-[70vh] max-w-4xl bg-[#1b1b1b] rounded-2xl shadow-2xl overflow-auto sm:overflow-hidden animate-in fade-in zoom-in duration-300"
-            >
-                <div className="flex flex-col md:flex-row p-8 gap-8">
-                    <div className="flex-shrink-0">
-                        <img
-                            src={movie.poster}
-                            alt={movie.title}
-                            className="w-64 h-96 object-cover rounded-xl shadow-lg"
-                        />
-                    </div>
-                    <div className="flex-1 flex flex-col">
-                        <div className="mb-4">
-                            <h1 className="text-4xl font-bold text-white mb-2">{movie.title}</h1>
-                            <div className="flex items-center gap-4 text-sm">
-                                <span className="text-gray-400">{movie.type?.toUpperCase()}</span>
-                                <div className="flex items-center gap-1">
-                                    <Star size={16} className="fill-[#F5C518] text-[#F5C518]" />
-                                    <span className="text-[#F5C518] font-semibold">{movie.rating}</span>
-                                    <span className="text-gray-400">/10</span>
-                                </div>
-                            </div>
-                        </div>
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose()
+    }
 
-                        <div className="mb-6">
-                            <h2 className="text-[#F5C518] text-lg font-semibold mb-2">About the Movie</h2>
-                            <p className="text-gray-300 leading-relaxed">{movie.plot}</p>
-                        </div>
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [onClose])
 
-                        <div className="grid grid-cols-2 gap-6">
-                            <div>
-                                <h3 className="text-[#F5C518] font-semibold mb-2">Release Date</h3>
-                                <div className="flex items-center gap-2 text-gray-300">
-                                    <Calendar size={16} />
-                                    <span>{movie.releaseDate}</span>
-                                </div>
-                            </div>
+  if (!movie) return null
 
-                            <div>
-                                <h3 className="text-[#F5C518] font-semibold mb-2">Year</h3>
-                                <p className="text-gray-300">{movie.year}</p>
-                            </div>
-
-                            <div className="col-span-2">
-                                <h3 className="text-[#F5C518] font-semibold mb-2">Languages</h3>
-                                <div className="flex items-start gap-2">
-                                    <Globe size={16} className="text-gray-400 mt-1 flex-shrink-0" />
-                                    <p className="text-gray-300">{movie.language}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+      role="presentation"
+    >
+      <section
+        className="movie-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="movie-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button className="icon-button modal-close" type="button" onClick={onClose} aria-label="Close movie details">
+          <X size={18} />
+        </button>
+        <div className="modal-content">
+          <div className="modal-poster">
+            {movie.poster && !imageFailed && (
+              <img src={movie.poster} alt={`${movie.title} poster`} onError={() => setImageFailed(true)} />
+            )}
+          </div>
+          <div className="modal-copy">
+            <div className="eyebrow"><span className="eyebrow-dot" /> A WatchWise pick</div>
+            <h2 id="movie-title">{movie.title}</h2>
+            <div className="modal-meta">
+              {movie.type && <span>{movie.type.toUpperCase()}</span>}
+              <span className="movie-rating"><Star size={15} fill="currentColor" /> {movie.rating || "—"}<span>/10</span></span>
+              {movie.year && <span>{movie.year}</span>}
             </div>
-        </div>
-    );
-};
 
-export default Popup;
+            <h3 className="modal-label">The story</h3>
+            <p className="modal-plot">{movie.plot || "A little mystery remains. Open this one up and see where the story takes you."}</p>
+
+            <div className="detail-grid">
+              <div className="detail-item">
+                <span><CalendarDays size={13} /> Release date</span>
+                <strong>{movie.releaseDate || movie.year || "Not available"}</strong>
+              </div>
+              <div className="detail-item">
+                <span><Globe2 size={13} /> Language</span>
+                <strong>{movie.language || "Not available"}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+export default Popup

@@ -1,20 +1,27 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
+import dotenv from "dotenv";
 
+dotenv.config();
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 export const getMovieRecommendation = async (prompt) => {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-    const model = genAI.getGenerativeModel({
-        model: "gemini-3-flash-preview",
-        generationConfig: {
-            temperature: 0.1,
+  try {
+    const completion = await groq.chat.completions.create({
+      model: "openai/gpt-oss-120b",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
         },
+      ],
+      temperature: 0.1,
     });
-    try {
-        const result = await model.generateContent(prompt);
-        return result.response.text();
-    } catch (error) {
-        console.error("Gemini Error:", error);
-        throw error;
-    }
+
+    return completion.choices[0]?.message?.content || "";
+  } catch (error) {
+    console.error("Groq Error:", error);
+    throw error;
+  }
 };

@@ -1,115 +1,130 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { getMovieRecommendation } from "../../Service/movieService.js";
-import Loader from "../../componentsRaw/Loader.jsx";
-import { useState, useEffect } from "react";
-import Navbar from "../../componentsRaw/Navbar.jsx";
-import Popup from "./Popup.jsx";
+import { ArrowLeft, Film, LoaderCircle, RefreshCw, Star } from "lucide-react"
+import { useCallback, useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import Navbar from "../../componentsRaw/Navbar.jsx"
+import { getMovieRecommendation } from "../../Service/movieService.js"
+import Popup from "./Popup.jsx"
 
-function Movies() {
-  const { state } = useLocation();
-  const preferences = state?.preferences
+function MoviePoster({ movie, className = "" }) {
+  const [imageFailed, setImageFailed] = useState(false)
 
-  const [movie, setmovie] = useState([])
-  const [loader, setloader] = useState(true)
-  const [selectedMovie, setselectedMovie] = useState(null)
-
-  useEffect(() => {
-    if (!preferences) return;
-
-    const fetchMovies = async () => {
-      try {
-        const res = await getMovieRecommendation(preferences);
-        setmovie(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setloader(false);
-      }
-    };
-    fetchMovies();
-  }, [preferences])
-
-  if (loader) {
-    return <Loader />
-  }
   return (
-    <>
-      <div className="flex flex-col items-center justify-start min-h-screen w-full bg-[#1b1b1b]">
-        <Navbar />
-
-        <div className="min-h-screen bg-[#1b1b1b] px-8 py-6">
-          <h1 className="text-2xl font-bold text-[#F5C518] mb-6">
-            Your Movie Recommendations 🎬
-          </h1>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-            {movie.map((movie, index) => (
-              <div
-                key={index}
-                onClick={() => setselectedMovie(movie)}
-                className="
-              relative
-              transition ease-in duration-550 ease-in-out
-              sm:h-[67vh]
-              sm:w-[20vw]
-              rounded-xl
-              overflow-hidden
-              border
-              hover:border-7 hover:border-[#F5C518] 
-              hover:scale-95
-              
-              border-[#F5C518]/30
-              bg-[#1b1b1b] flex flex-col
-            "
-              >
-                <img
-                  src={movie.poster}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      'https://imgs.search.brave.com/P8RUDEd7125NRWmN6fGrlcAyoYtr-gGqiFGCI4SERYk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzk3LzE0/L2IyLzk3MTRiMjA1/YWY2MTE2YmY5YWFi/ZjE1OWY0MjMzNzNi/LmpwZw';
-                  }}
-                  className="w-full h-[60vh] object-cover object-top"
-                />
-                <div
-
-                  className="
-                absolute
-                inset-x-0
-                bottom-0
-                h-[60vh] 
-                bg-gradient-to-t
-                from-black
-                via-black/90
-                to-transparent
-              "
-                />
-
-                <div className="absolute bottom-7 z-10 p-4 w-full flex flex-col  ">
-                  <h2
-                    className={`font-bold  text-white leading-tight ${movie.title.length > 10 ? "text-2xl" : "text-3xl"
-                      }`}
-                  >
-                    {movie.title}
-                  </h2>
-                  <p className="text-sm  text-gray-300 absolute -bottom-3 font-bold">
-                    {movie.year}
-                  </p>
-                  <p className="text-sm  text-gray-300 mt-4 font-bold">
-                    IMDb: {movie.rating}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {selectedMovie && (
-              <Popup movie={selectedMovie} onClose={() => setselectedMovie(null)} />
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-
-  );
+    <div className={`movie-poster ${className}`}>
+      {(!movie.poster || imageFailed) && <div className="poster-fallback"><Film size={34} /></div>}
+      {movie.poster && !imageFailed && (
+        <img src={movie.poster} alt={`${movie.title} poster`} onError={() => setImageFailed(true)} />
+      )}
+    </div>
+  )
 }
 
-export default Movies;
+function Movies() {
+  const { state } = useLocation()
+  const navigate = useNavigate()
+  const preferences = state?.preferences
+  const initialMovies = state?.movies
+  const [movies, setMovies] = useState(Array.isArray(initialMovies) ? initialMovies : [])
+  const [loading, setLoading] = useState(!Array.isArray(initialMovies))
+  const [error, setError] = useState("")
+  const [selectedMovie, setSelectedMovie] = useState(null)
+
+  const fetchMovies = useCallback(async () => {
+    setLoading(true)
+    setError("")
+    try {
+      const result = await getMovieRecommendation(preferences)
+      setMovies(Array.isArray(result.data) ? result.data : [])
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "We couldn't reach the recommendation service. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }, [preferences])
+
+  useEffect(() => {
+    if (Array.isArray(initialMovies)) return
+    if (!preferences) {
+      navigate("/preferences", { replace: true })
+      return
+    }
+    fetchMovies()
+  }, [fetchMovies, initialMovies, navigate, preferences])
+
+  const editPreferences = () => navigate("/preferences")
+
+  return (
+    <div className="app-shell">
+      <Navbar />
+      {loading ? (
+        <main className="loading-page">
+          <div className="loading-content">
+            <div className="loading-orb"><LoaderCircle size={25} className="spin-icon" /></div>
+            <div className="eyebrow"><span className="eyebrow-dot" /> Curating your shortlist</div>
+            <p>Finding the right movie for your kind of night...</p>
+          </div>
+        </main>
+      ) : (
+        <main className="results-main">
+          <button className="text-link" type="button" onClick={editPreferences}>
+            <ArrowLeft size={15} /> Edit my picks
+          </button>
+          <div>
+            <header className="results-heading">
+              <div>
+                <p className="eyebrow">YOUR RECOMMENDATIONS</p>
+                <h1>Movies for tonight</h1>
+              </div>
+            </header>
+
+            {error ? (
+              <section className="empty-state" aria-live="polite">
+                <div>
+                  <h2>We hit a small snag.</h2>
+                  <p>{error}</p>
+                  <button className="button-primary" type="button" onClick={fetchMovies}>
+                    <RefreshCw size={16} /> Try again
+                  </button>
+                </div>
+              </section>
+            ) : movies.length ? (
+              <section className="movie-grid" aria-label="Recommended movies">
+                {movies.map((movie, index) => (
+                  <button
+                    className="movie-card"
+                    key={`${movie.title}-${movie.year ?? index}`}
+                    type="button"
+                    onClick={() => setSelectedMovie(movie)}
+                    aria-label={`View details for ${movie.title}`}
+                  >
+                    <MoviePoster movie={movie} />
+                    <div className="movie-card-info">
+                      <h2>{movie.title}</h2>
+                      <div className="movie-card-meta">
+                        <span>{movie.year || movie.type || "Movie"}</span>
+                        <span className="movie-rating"><Star size={13} fill="currentColor" /> {movie.rating || "—"}</span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </section>
+            ) : (
+              <section className="empty-state" aria-live="polite">
+                <div>
+                  <h2>No matches this time.</h2>
+                  <p>Try a different mood or genre and we&apos;ll find another shortlist for you.</p>
+                  <button className="button-primary" type="button" onClick={editPreferences}>
+                    <RefreshCw size={16} /> Adjust my picks
+                  </button>
+                </div>
+              </section>
+            )}
+          </div>
+        </main>
+      )}
+
+      {selectedMovie && <Popup movie={selectedMovie} onClose={() => setSelectedMovie(null)} />}
+    </div>
+  )
+}
+
+export default Movies

@@ -1,202 +1,178 @@
-import React, { useState } from 'react'
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { Popcorn } from 'lucide-react';
-import Navbar from '../../componentsRaw/Navbar';
-import CustomSelect from '../../componentsRaw/CustomSelect';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { MultiSelect } from '@/components/ui/multi-select.jsx';
-import { useNavigate } from 'react-router-dom';
-import { getMovieRecommendation } from '../../Service/movieService.js';
-import { motion } from 'motion/react'
+import { ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Navbar from "../../componentsRaw/Navbar.jsx"
+import { getMovieRecommendation } from "../../Service/movieService.js"
+
+const moods = [
+  { value: "action", label: "Big action" },
+  { value: "adventure", label: "Epic adventure" },
+  { value: "comedy", label: "A good laugh" },
+  { value: "horror", label: "A little spooky" },
+  { value: "inspiring", label: "Feel-good" },
+  { value: "thriller", label: "Edge of my seat" },
+  { value: "romance", label: "Romantic" },
+  { value: "nostalgic", label: "Nostalgic" },
+]
+
+const genres = ["Action", "Comedy", "Horror", "Romance", "Sci-Fi", "Fantasy", "Crime/Thriller", "Drama"]
+const languages = ["English", "Hindi", "Korean", "French", "Spanish"]
+const eras = ["2020+", "2010s", "2000s", "Retro"]
+const resultCounts = ["5", "10", "15", "20"]
 
 function Preferences() {
+  const navigate = useNavigate()
+  const [mood, setMood] = useState("")
+  const [genre, setGenre] = useState([])
+  const [language, setLanguage] = useState("")
+  const [era, setEra] = useState("")
+  const [notes, setNotes] = useState("")
+  const [numberOfRec, setNumberOfRec] = useState("5")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const navigateTo = useNavigate()
-  const [mood, setmood] = useState("")
-  const [genre, setgenre] = useState([])
-  const [language, setlanguage] = useState("")
-  const [era, setera] = useState("")
-  const [notes, setnotes] = useState("")
-  const [numberOfRec, setnumbesOfRec] = useState("")
-  const [err, seterr] = useState(null)
-  const [loading, setLoading] = useState(false);
-
-
-
-  const moodOptions = [
-    { value: "action", label: "Craving high-octane action" },
-    { value: "adventure", label: "In the mood for a grand adventure" },
-    { value: "comedy", label: "Just want a good laugh" },
-    { value: "horror", label: "Ready for something truly scary" },
-    { value: "inspiring", label: "Looking for something uplifting" },
-    { value: "thriller", label: "In the mood for dark suspense" },
-    { value: "romance", label: "Feeling romantic tonight" },
-    { value: "nostalgic", label: "Missing the good old days" }
-  ]
-
-  const genreOptions = [
-    { value: "Action", label: "Action" },
-    { value: "Comedy", label: "Comedy" },
-    { value: "Horror", label: "Horror" },
-    { value: "Romance", label: "Romance" },
-    { value: "Sci-Fi", label: "Sci-Fi" },
-    { value: "Fantasy", label: "Fantasy" },
-    { value: "Crime/Thriller", label: "Crime/Thriller" },
-    { value: "Drama", label: "Drama" },
-  ]
-
-  const languageOption = [
-    { value: "English", label: "English" },
-    { value: "Hindi", label: "Hindi" },
-    { value: "Korean", label: "Korean" },
-    { value: "Franch", label: "Franch" },
-    { value: "Spanish", label: "Spanish" },
-  ]
-
-  const eraOptions = [
-    { value: "2020+", label: '2020+' },
-    { value: "2000s", label: '2000s' },
-    { value: "2010s", label: '2010s' },
-    { value: "Retro", label: 'Retro' },
-  ]
-
-  const numberOfRecOptions = [
-    { value: "5", label: "5" },
-    { value: "10", label: "10" },
-    { value: "15", label: "15" },
-    { value: "20", label: "20" },
-  ]
-const submiteHandler = async (e) => {
-  e.preventDefault();
-  seterr("");
-  setLoading(true);
-
-  if (!genre.length) {
-    setLoading(false);
-    toast.error("Please select at least one genre");
-    seterr("Please select at least one genre");
-    return;
+  const toggleGenre = (selectedGenre) => {
+    setError("")
+    if (genre.includes(selectedGenre)) {
+      setGenre((current) => current.filter((item) => item !== selectedGenre))
+    } else if (genre.length >= 3) {
+      setError("Choose up to 3 genres to keep your shortlist focused.")
+    } else {
+      setGenre((current) => [...current, selectedGenre])
+    }
   }
 
-  const preferences = {
-    mood,
-    genre,
-    language,
-    era,
-    notes,
-    numberOfRec: Number(numberOfRec)
-  };
+  const submitHandler = async (event) => {
+    event.preventDefault()
+    setError("")
 
-  try {
-    const result = await getMovieRecommendation(preferences);
+    if (!mood || !genre.length || !language || !era) {
+      setError("Choose a mood, 1–3 genres, a language, and an era to get your recommendations.")
+      return
+    }
 
-    navigateTo("/movies", {
-      state: {
-        movies: result,
-        preferences
-      }
-    });
-
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      "Recommendation service is waking up. Please try again.";
-
-    seterr(message);
-    toast.error(message);
-  } finally {
-    setLoading(false);
+    const preferences = { mood, genre, language, era, notes: notes.trim(), numberOfRec: Number(numberOfRec) }
+    setLoading(true)
+    try {
+      const result = await getMovieRecommendation(preferences)
+      const movies = Array.isArray(result?.data) ? result.data : []
+      navigate("/movies", { state: { movies, preferences } })
+    } catch (requestError) {
+      const message = requestError.response?.data?.message
+        || "We couldn't reach the recommendation service. Please try again."
+      setError(message)
+    } finally {
+      setLoading(false)
+    }
   }
-};
-
 
   return (
-    <>
+    <div className="app-shell">
       <Navbar />
-      <div className=' min-h-screen w-full bg-[#1b1b1b] flex items-start justify-center p-4 pb-15 '>
-        <motion.div initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }} className='w-[95vw] sm:w-full max-w-2xl bg-[#252525] px-10 py-12 rounded-xl border-2 mt-[4vw] border-[#F5C518] shadow-lg shadow-[#F5C518]/10'>
-          <div className='flex items-center gap-6 justify-center flex-col sm:gap-3 mb-8'>
-            <Popcorn size={65} color="#F5C518" />
-            <div className='flex flex-col justify-start items-center gap-3 sm:gap-0'>
-              <h1 className=" text-3xl font-bold tracking-tight text-[#F5C518] ">
-                Movies that match your moment
-              </h1>
-              <p className="mt-1 text-sm text-gray-200">
-                Tell us your preferences and let WatchWise do the thinking.
-              </p>
-            </div>
-          </div>
+      <main className="preferences-main">
+        <button className="text-link" type="button" onClick={() => navigate("/")}>
+          <ArrowLeft size={15} /> Back to home
+        </button>
+        <div>
+          <header className="page-heading">
+            <p className="eyebrow">YOUR NEXT MOVIE</p>
+            <h1>What are you in the mood for?</h1>
+            <p>Choose a few preferences to get recommendations.</p>
+          </header>
 
-          <form onSubmit={submiteHandler} className='flex flex-col gap-3 text-gray-400'>
-            <CustomSelect options={moodOptions} value={mood} onChange={setmood} placeholder={"What vibe are you in?"} label="Current mood" />
+          <form className="form-panel" onSubmit={submitHandler}>
+            <section className="form-section">
+              <h2 className="section-title">Mood</h2>
+              <div className="choice-grid">
+                {moods.map((option) => (
+                  <button
+                    className={`choice-chip${mood === option.value ? " is-selected" : ""}`}
+                    key={option.value}
+                    type="button"
+                    aria-pressed={mood === option.value}
+                    onClick={() => { setMood(option.value); setError("") }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-            <h1 className="block text-md font-semibold text-[#F5C518] mb-2">
-              Your Genre Pick
-            </h1>
-            <MultiSelect maxSelection={3} className='w-full bg-[#1b1b1b] text-gray-200 hover:text-gray-200  border-2 border-gray-700 hover:border-[#F5C518] rounded-lg px-4 py-3 focus:outline-none focus:border-[#F5C518] focus:ring-2 focus:ring-[#F5C518]/50 transition-all' options={genreOptions} value={genre} onValueChange={setgenre} />
-            <CustomSelect options={languageOption} value={language} onChange={setlanguage} placeholder="Language You Like  " label="Choose a language" />
-            <CustomSelect options={eraOptions} value={era} onChange={setera} placeholder="What Era you enjoy most?" label="Pick a movie Era" />
-            <div className="flex flex-col gap-2">
-              <label className="text-md font-semibold text-[#F5C518]">
-                Extra Notes
-              </label>
+            <section className="form-section">
+              <h2 className="section-title">
+                Genres
+                <small>{genre.length}/3 selected</small>
+              </h2>
+              <div className="choice-grid">
+                {genres.map((item) => (
+                  <button
+                    className={`choice-chip${genre.includes(item) ? " is-selected" : ""}`}
+                    key={item}
+                    type="button"
+                    aria-pressed={genre.includes(item)}
+                    onClick={() => toggleGenre(item)}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-              <input
-                type="text"
-                value={notes}
-                onChange={(e) => { setnotes(e.target.value) }}
-                placeholder="Anything specific you’re in the mood for?"
-                className="
-      w-full
-      bg-[#1b1b1b]
-      placeholder:text-gray-500
-      border-2 border-gray-700
-      text-[13px]
-      transition-all duration-300
-      focus:outline-none
-      focus:border-[#F5C518]
-      focus:ring-2 focus:ring-[#F5C518]/40
-      hover:border-[#F5C518]/70
-      text-gray-100 hover:bg-[#F5C518]/20  focus:bg-[#F5C518]/20  cursor-pointer py-2 
-      px-3.5 rounded-lg
-    "
-              />
-            </div>
-            <CustomSelect options={numberOfRecOptions} value={numberOfRec} onChange={setnumbesOfRec} placeholder="Number of movies for Recommendation" label="How many Movies?" />
-            <div className='flex justify-center w-[43vw]'>
-              <Button
-  type="submit"
-  disabled={loading}
-  className={`ml-[29vw] sm:ml-0 mt-5 -mb-3 sm:w-[17vw] bg-[#F5C518] hover:bg-[#e6b510] text-[#1b1b1b] font-bold text-md py-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-[#F5C518]/50 hover:scale-[1.02] active:scale-[0.98] border-none ${
-    loading ? "opacity-60 cursor-not-allowed" : ""
-  }`}
->
-  {loading ? "Getting Recommendations..." : "Get Recommendations 🎬"}
-</Button>
+            <section className="form-section">
+              <div className="form-row">
+                <div>
+                  <label className="field-label" htmlFor="language">Language</label>
+                  <select className="select-field" id="language" value={language} onChange={(event) => { setLanguage(event.target.value); setError("") }}>
+                    <option value="">Any language you like</option>
+                    {languages.map((item) => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="era">Era</label>
+                  <select className="select-field" id="era" value={era} onChange={(event) => { setEra(event.target.value); setError("") }}>
+                    <option value="">Choose an era</option>
+                    {eras.map((item) => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                </div>
+              </div>
+            </section>
 
-            </div>
-               {/* {err && (
-              <p className="text-red-500 text-sm text-center mt-2">
-                {err}
-              </p>
-            )} */}
+            <section className="form-section">
+              <div className="form-row">
+                <div>
+                  <label className="field-label" htmlFor="notes">Anything else on your mind? <span className="form-hint">(optional)</span></label>
+                  <input
+                    className="text-field"
+                    id="notes"
+                    type="text"
+                    maxLength={240}
+                    value={notes}
+                    onChange={(event) => setNotes(event.target.value)}
+                    placeholder="A clever twist, a cozy setting..."
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="count">How many suggestions?</label>
+                  <select className="select-field" id="count" value={numberOfRec} onChange={(event) => setNumberOfRec(event.target.value)}>
+                    {resultCounts.map((count) => <option key={count} value={count}>{count} movies</option>)}
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            {error && <p className="form-error" role="alert">{error}</p>}
+
+            <footer className="preferences-footer">
+              <button className="button-primary" type="submit" disabled={loading}>
+                {loading && <LoaderCircle size={17} className="spin-icon" />}
+                {loading ? "Finding movies..." : "Show recommendations"}
+                {!loading && <ArrowRight size={16} />}
+              </button>
+            </footer>
           </form>
-        </motion.div>
-      </div>
-      <ToastContainer
-  position="top-right"
-  autoClose={3000}
-  hideProgressBar={false}
-  closeOnClick
-  pauseOnHover
-  draggable
-  theme="dark"
-/>
-
-    </>
+        </div>
+      </main>
+    </div>
   )
 }
 
